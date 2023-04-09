@@ -1,6 +1,7 @@
 from flask import Flask, request, make_response, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
+from flask_restful import Api, Resource
 
 from models import db, Camper, Activity, Signup
 
@@ -14,19 +15,19 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
-# api = Api(app)
+api = Api(app)
 
+class Home(Resource):
+    def get(self):
+        response = make_response(
+            {
+                "message": "Hello Campers!"
+            },
+            200
+        )
+        return response
 
-@app.route('/')
-def index():
-    response = make_response(
-        {
-            "message": "Hello Campers!"
-        },
-        200
-    )
-    return response
-
+api.add_resource(Home, '/')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
