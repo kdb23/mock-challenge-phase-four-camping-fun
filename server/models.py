@@ -19,20 +19,20 @@ class Camper(db.Model, SerializerMixin):
 
     signups = db.relationship("Signup", backref = "camper")
 
-    # @validates('name')
-    # def validate_name(self, key, name):
-    #     names = db.session.query(Camper.name).all()
-    #     if not name:
-    #         raise ValueError("Camper must have a Name")
-    #     return names
+    @validates('name')
+    def validate_name(self, key, name):
+        names = db.session.query(Camper.name).all()
+        if not name:
+            raise ValueError("Camper must have a Name")
+        return names
     
-    # @validates('age')
-    # def validate_age(self, key, age):
-    #     if age > 8:
-    #         return ValueError("Camper must be at least 8 years old to participate")
-    #     elif age < 18:
-    #         return ValueError("Camper must be under 18 to participate")
-    #     return age
+    @validates('age')
+    def validate_age(self, key, age):
+        if age > 8:
+            return ValueError("Camper must be at least 8 years old to participate")
+        elif age < 18:
+            return ValueError("Camper must be under 18 to participate")
+        return age
     
     def __repr__(self):
         return f'<Camper id={self.id}, name={self.name}, age={self.age}>'
