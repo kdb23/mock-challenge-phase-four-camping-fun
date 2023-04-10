@@ -12,7 +12,7 @@ class Camper(db.Model, SerializerMixin):
     serialize_rules = ('-signups.camper', )
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
     age = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
@@ -28,10 +28,10 @@ class Camper(db.Model, SerializerMixin):
     
     @validates('age')
     def validate_age(self, key, age):
-        if age > 8:
-            return ValueError("Camper must be at least 8 years old to participate")
-        elif age < 18:
-            return ValueError("Camper must be under 18 to participate")
+        if age < 8:
+            raise ValueError("Camper must be at least 8 years old to participate")
+        elif age > 18:
+            raise ValueError("Camper must be under 18 to participate")
         return age
     
     def __repr__(self):
@@ -67,7 +67,7 @@ class Signup(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
 
-    @validates
+    @validates(time)
     def validate_time(self, key, time):
         meet_time = db.session.query(Signup.time).all()
         if time < 0 or time > 23:

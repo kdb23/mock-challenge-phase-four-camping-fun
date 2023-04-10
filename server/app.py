@@ -42,6 +42,18 @@ class Campers(Resource):
             kid_list.append(c_dict)
 
         return make_response(jsonify(kid_list), 200)
+
+    def post(self):
+        data = request.get_json()
+        new_kid = Camper (
+            name=data['name'],
+            age=data['age']
+        )
+        db.session.add(new_kid)
+        db.session.commit()
+
+        return make_response(new_kid.to_dict(), 201)
+
     
 api.add_resource(Campers, '/campers' )
 
@@ -73,6 +85,38 @@ class CamperById(Resource):
 api.add_resource(CamperById, '/campers/<int:id>')
 
 
+class Activities(Resource):
+    def get(self):
+        fun = Activity.query.all()
+        fun_list = []
+        for f in fun:
+            f_dict = {
+                'id': f.id,
+                'name': f.name,
+                'difficulty': f.difficulty, 
+            }
+            fun_list.append(f_dict)
+
+        return make_response(jsonify(fun_list), 200)
+
+api.add_resource(Activities, '/activities')
+
+class ActivitiesById(Resource):
+    def get(self, id):
+
+        return "Lil Miss Sunshine"
+    
+    def delete(self, id):
+        doomed_activity = Activity.query.filter_by(id = id).first()
+        db.session.delete(doomed_activity)
+        db.session.commit()
+
+        return make_response({'message': 'Activity Not Found'}, 404)
+
+api.add_resource(ActivitiesById, '/activities/<int:id>')
+
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
+
