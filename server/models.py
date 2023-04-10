@@ -17,6 +17,7 @@ class Camper(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
+    activities = association_proxy('signups', 'activity', creator=lambda ac:Signup(activity=ac))
     signups = db.relationship("Signup", backref = "camper")
 
     @validates('name')
@@ -48,6 +49,8 @@ class Activity(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
+
+    campers = association_proxy('signups', 'camper', creator=lambda ca:Signup(campers=ca))
     signups = db.relationship("Signup", backref = "activity")
 
     def __repr__(self):

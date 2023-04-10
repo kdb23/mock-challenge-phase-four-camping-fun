@@ -58,27 +58,50 @@ class Campers(Resource):
 api.add_resource(Campers, '/campers' )
 
 class CamperById(Resource):
-    def get(self, id):
-        camper = Camper.query.filter_by(id = id).first()
-        if camper:
-            camper_dict ={
-                'id': camper.id,
-                'name': camper.name,
-                'age': camper.age,
-                'activities': []
-            }
-            activities = Activity.query.filter_by(id = id).all()
-            for a in activities:
-                fun_time = {
-                    'id': a.id,
-                    'name': a.name,
-                    'difficulty': a.difficulty
-                }
-                camper_dict['activities'].append(fun_time)
 
-            return make_response(jsonify(camper_dict), 200)
-        else:
+    # def get(self, id):
+    #     camper = Camper.query.filter_by(id = id).one()
+    #     if camper:
+    #         event = Signup.query.filter_by(id = id).all()
+    #         events = []
+    #         for e in event:
+    #             fun = Activity.query.get(e.activity_id)
+    #             events.append({
+    #                 'id':fun.id,
+    #                 'name':fun.name,
+    #                 'difficulty':fun.difficulty
+    #             })
+    #         camper_dict = {
+    #             'id': camper.id,
+    #             'name': camper.name,
+    #             'age': camper.age,
+    #             'activites': events
+    #         }
+    #         return make_response(jsonify(camper_dict), 200)
+    #     else:
+    #         return make_response(jsonify({'message': 'Camper Not Found'}, 404))
+
+      def get(self, id):
+        camper = Camper.query.filter_by(id = id).first()
+        if  not camper:
             return make_response({'message': 'Camper Not Found'}, 404)
+        
+        camper_dict = {
+            'id': camper.id,
+            'name': camper.name,
+            'age': camper.age,
+            'activites': []
+        }
+        for events in camper.activities:
+            activity ={
+            'id':events.id,
+            'name':events.name,
+            'difficulty':events.difficulty
+            }
+            camper_dict['activites'].append(activity)
+
+        return make_response(jsonify(camper_dict), 200)
+
     
 
 
@@ -103,8 +126,8 @@ api.add_resource(Activities, '/activities')
 
 class ActivitiesById(Resource):
     def get(self, id):
-
-        return "Lil Miss Sunshine"
+        play_time = Activity.query.filter_by(id = id).to_dict()
+        return make_response(jsonify(play_time), 200)
     
     def delete(self, id):
         doomed_activity = Activity.query.filter_by(id = id).first()
