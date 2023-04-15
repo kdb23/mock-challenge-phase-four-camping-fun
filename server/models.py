@@ -9,7 +9,7 @@ db = SQLAlchemy()
 class Camper(db.Model, SerializerMixin):
     __tablename__ = 'campers'
 
-    serialize_rules = ('-signups.camper', )
+    serialize_rules = ('-signups', '-created_at', '-updated_at', '-activities.created_at', '-activities.camper')
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -41,7 +41,7 @@ class Camper(db.Model, SerializerMixin):
 class Activity(db.Model, SerializerMixin):
     __tablename__ = 'activities'
 
-    serialize_rules = ('-signups.activity', )
+    serialize_rules = ('-signups', '-created_at', '-updated_at', '-campers.activities', )
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
@@ -60,7 +60,7 @@ class Activity(db.Model, SerializerMixin):
 class Signup(db.Model, SerializerMixin):
     __tablename__ = 'signups'
 
-    serialize_rules = ('-activity.signups', '-camper.signups', )
+    serialize_rules = ('-activity.signups', '-camper.signups','-created_at', '-updated_at', '-activity.campers', '-activity.signups')
 
     id = db.Column(db.Integer, primary_key=True)
     camper_id = db.Column(db.Integer, db.ForeignKey('campers.id'))

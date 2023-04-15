@@ -45,10 +45,13 @@ class Campers(Resource):
 
     def post(self):
         data = request.get_json()
-        new_kid = Camper (
-            name=data['name'],
-            age=data['age']
-        )
+        try:
+            new_kid = Camper (
+                name=data['name'],
+                age=data['age']
+            )
+        except ValueError:
+            return make_response({'error': 'validation error'}, 422)
         db.session.add(new_kid)
         db.session.commit()
 
@@ -59,27 +62,6 @@ api.add_resource(Campers, '/campers' )
 
 class CamperById(Resource):
 
-    # def get(self, id):
-    #     camper = Camper.query.filter_by(id = id).one()
-    #     if camper:
-    #         event = Signup.query.filter_by(id = id).all()
-    #         events = []
-    #         for e in event:
-    #             fun = Activity.query.get(e.activity_id)
-    #             events.append({
-    #                 'id':fun.id,
-    #                 'name':fun.name,
-    #                 'difficulty':fun.difficulty
-    #             })
-    #         camper_dict = {
-    #             'id': camper.id,
-    #             'name': camper.name,
-    #             'age': camper.age,
-    #             'activites': events
-    #         }
-    #         return make_response(jsonify(camper_dict), 200)
-    #     else:
-    #         return make_response(jsonify({'message': 'Camper Not Found'}, 404))
 
       def get(self, id):
         camper = Camper.query.filter_by(id = id).first()
@@ -131,13 +113,39 @@ class ActivitiesById(Resource):
     
     def delete(self, id):
         doomed_activity = Activity.query.filter_by(id = id).first()
-        db.session.delete(doomed_activity)
-        db.session.commit()
+        if not doomed_activity:
+            return make_response({'error': 'Activity Not Found'}, 404)
+        else:
+            db.session.delete(doomed_activity)
+            db.session.commit()
 
-        return make_response({'message': 'Activity Not Found'}, 404)
+            return make_response({'message': ''}, 200)
 
 api.add_resource(ActivitiesById, '/activities/<int:id>')
 
+class Signups(Resource):
+
+    def get(self):
+        fun_times = [fun.to_dict() for fun in Signup.query.all()]
+        return make_response(jsonify(fun_times), 200)
+
+    def post(self):
+        data = request.get_json()
+        try:
+            new_signup = Signup (
+                time=data['time'],
+                camper_id=data['camper_id'],
+                activity_id=data['activity_id']
+            )
+        except ValueError:
+            return make_response({'errors': 'validation error'}, 400)
+        db.session.add(new_signup)
+        db.session.commit()
+
+        return make_response(new_signup.activity.to_dict(), 201)
+    
+
+api.add_resource(Signups, '/signups')
 
 
 if __name__ == '__main__':
